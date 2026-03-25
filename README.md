@@ -42,7 +42,7 @@ budget-guard-link                    # links the plugin into SwiftBar
 
 ### Option B -- DMG installer
 
-1. Download the latest `.dmg` from the [Releases](https://github.com/dalex160/claude-budget-guard/releases) page
+1. Download the latest `.dmg` from the [Releases](https://github.com/dalex160/claude-budget-watch/releases) page
 2. Open the DMG and run **Install Budget Guard**
 3. The installer will set up SwiftBar (if needed) and install the plugin
 
@@ -51,7 +51,7 @@ budget-guard-link                    # links the plugin into SwiftBar
 This way you can `git pull` updates without re-copying.
 
 ```bash
-git clone https://github.com/dalex160/claude-budget-guard.git ~/budget-guard
+git clone https://github.com/dalex160/claude-budget-watch.git ~/budget-guard
 
 # Create a symlink in SwiftBar's plugin directory
 mkdir -p "$HOME/Library/Application Support/SwiftBar/Plugins"
@@ -61,7 +61,7 @@ ln -sf ~/budget-guard/budget-guard.2m.sh "$HOME/Library/Application Support/Swif
 ### Option D -- Direct copy
 
 ```bash
-git clone https://github.com/dalex160/claude-budget-guard.git ~/budget-guard
+git clone https://github.com/dalex160/claude-budget-watch.git ~/budget-guard
 
 mkdir -p "$HOME/Library/Application Support/SwiftBar/Plugins"
 cp ~/budget-guard/budget-guard.2m.sh "$HOME/Library/Application Support/SwiftBar/Plugins/"
