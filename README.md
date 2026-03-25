@@ -31,28 +31,37 @@ Budget Guard is a [SwiftBar](https://github.com/swiftbar/SwiftBar) plugin that d
 
 ## Installation
 
-### Option A -- DMG installer (easiest)
+### Option A -- Homebrew (recommended)
 
-1. Download the latest `.dmg` from the [Releases](https://github.com/dalex160/claude-budget-watch/releases) page
+```bash
+brew install --cask swiftbar        # if not already installed
+brew tap dalex160/budget-guard
+brew install budget-guard
+budget-guard-link                    # links the plugin into SwiftBar
+```
+
+### Option B -- DMG installer
+
+1. Download the latest `.dmg` from the [Releases](https://github.com/dalex160/claude-budget-guard/releases) page
 2. Open the DMG and run **Install Budget Guard**
 3. The installer will set up SwiftBar (if needed) and install the plugin
 
-### Option B -- Symlink (recommended for developers)
+### Option C -- Symlink (recommended for developers)
 
 This way you can `git pull` updates without re-copying.
 
 ```bash
-git clone https://github.com/dalex160/claude-budget-watch.git ~/budget-guard
+git clone https://github.com/dalex160/claude-budget-guard.git ~/budget-guard
 
 # Create a symlink in SwiftBar's plugin directory
 mkdir -p "$HOME/Library/Application Support/SwiftBar/Plugins"
 ln -sf ~/budget-guard/budget-guard.2m.sh "$HOME/Library/Application Support/SwiftBar/Plugins/budget-guard.2m.sh"
 ```
 
-### Option C -- Direct copy
+### Option D -- Direct copy
 
 ```bash
-git clone https://github.com/dalex160/claude-budget-watch.git ~/budget-guard
+git clone https://github.com/dalex160/claude-budget-guard.git ~/budget-guard
 
 mkdir -p "$HOME/Library/Application Support/SwiftBar/Plugins"
 cp ~/budget-guard/budget-guard.2m.sh "$HOME/Library/Application Support/SwiftBar/Plugins/"
