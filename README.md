@@ -33,7 +33,7 @@ Budget Guard is a [SwiftBar](https://github.com/swiftbar/SwiftBar) plugin that d
 
 ### Option A -- DMG installer (easiest)
 
-1. Download the latest `.dmg` from the [Releases](https://github.com/alexmusic/budget-guard/releases) page
+1. Download the latest `.dmg` from the [Releases](https://github.com/dalex160/budget-guard/releases) page
 2. Open the DMG and run **Install Budget Guard**
 3. The installer will set up SwiftBar (if needed) and install the plugin
 
@@ -42,7 +42,7 @@ Budget Guard is a [SwiftBar](https://github.com/swiftbar/SwiftBar) plugin that d
 This way you can `git pull` updates without re-copying.
 
 ```bash
-git clone https://github.com/alexmusic/budget-guard.git ~/budget-guard
+git clone https://github.com/dalex160/budget-guard.git ~/budget-guard
 
 # Create a symlink in SwiftBar's plugin directory
 mkdir -p "$HOME/Library/Application Support/SwiftBar/Plugins"
@@ -52,7 +52,7 @@ ln -sf ~/budget-guard/budget-guard.2m.sh "$HOME/Library/Application Support/Swif
 ### Option C -- Direct copy
 
 ```bash
-git clone https://github.com/alexmusic/budget-guard.git ~/budget-guard
+git clone https://github.com/dalex160/budget-guard.git ~/budget-guard
 
 mkdir -p "$HOME/Library/Application Support/SwiftBar/Plugins"
 cp ~/budget-guard/budget-guard.2m.sh "$HOME/Library/Application Support/SwiftBar/Plugins/"
