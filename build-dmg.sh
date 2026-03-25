@@ -42,12 +42,8 @@ mkdir -p "$RESOURCES_DIR"
 cat > "$MACOS_DIR/launcher" <<'LAUNCHER'
 #!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "$0")/../../../" && pwd)"
-osascript -e "
-tell application \"Terminal\"
-    activate
-    do script \"bash '${SCRIPT_DIR}/install.sh'\"
-end tell
-"
+INSTALL_SCRIPT="$SCRIPT_DIR/install.sh"
+open -a Terminal "$INSTALL_SCRIPT"
 LAUNCHER
 chmod +x "$MACOS_DIR/launcher"
 

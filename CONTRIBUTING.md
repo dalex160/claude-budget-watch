@@ -5,7 +5,7 @@ Thanks for your interest in contributing!
 ## How to contribute
 
 1. **Open an issue** first to discuss the change you'd like to make.
-2. **Fork the repository** and create a feature branch from `main`.
+2. **Fork the repository** and create a feature branch from `master`.
 3. **Make your changes** and test them locally with SwiftBar.
 4. **Submit a pull request** with a clear description of what you changed and why.
 
