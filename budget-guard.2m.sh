@@ -51,12 +51,11 @@ fmt_pct() {
 # --- Color based on usage level ---
 get_color() {
     local pct="$1"
-    # SwiftBar syntax: color=light_mode,dark_mode — needed for dark menu bar visibility
-    if [[ "$pct" == "?" ]]; then echo "gray,#8e8e93"; return; fi
-    if (( pct >= 90 )); then echo "#cc0000,#ff453a"
-    elif (( pct >= 70 )); then echo "#cc6600,#ff9f0a"
-    elif (( pct >= 60 )); then echo "#996600,#ffd60a"
-    else echo "#1a8a1a,#30d158"
+    if [[ "$pct" == "?" ]]; then echo "gray"; return; fi
+    if (( pct >= 90 )); then echo "red"
+    elif (( pct >= 70 )); then echo "orange"
+    elif (( pct >= 60 )); then echo "yellow"
+    else echo "green"
     fi
 }
 
@@ -242,9 +241,9 @@ fi
 
 # --- Menu bar title ---
 if [[ "$MAX_U" == "?" ]]; then
-    echo "CC: ? | size=13 color=gray"
+    echo "CC: ? | size=13"
 else
-    echo "CC: ${U5_PCT}% / ${U7_PCT}% | size=13 color=$COLOR"
+    echo "CC: ${U5_PCT}% / ${U7_PCT}% | size=13"
 fi
 
 echo "---"
