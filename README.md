@@ -121,8 +121,8 @@ The menu bar text changes color based on the highest usage percentage:
 
 | Usage | Color |
 |---|---|
-| < 50% | Green |
-| 50-69% | Yellow |
+| < 60% | Green |
+| 60-69% | Yellow |
 | 70-89% | Orange |
 | >= 90% | Red |
 
