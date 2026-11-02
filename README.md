@@ -4,16 +4,16 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Budget Guard is a [SwiftBar](https://github.com/swiftbar/SwiftBar) plugin that displays your Claude Max rate-limit consumption (5-hour and 7-day windows) directly in the macOS menu bar. No more surprise throttles.
+Budget Guard is a [SwiftBar](https://github.com/swiftbar/SwiftBar) plugin that displays your Claude Max weekly rate-limit consumption (Claude now uses a single 7-day window — the 5-hour window is gone) directly in the macOS menu bar. No more surprise throttles.
 
 ---
 
 ## What it does
 
-- Shows **5h** and **7d** usage percentages at a glance: `CC: 42% / 18%`
+- Shows your **weekly (7d)** usage percentage at a glance: `CC: 18%`
 - **Color-coded** display: green, yellow, orange, red depending on usage level
 - **macOS notifications** when usage crosses 80% and 95% thresholds
-- Displays time until each rate-limit window resets in the dropdown
+- Displays time until the weekly window resets, and whether overage is available in the dropdown
 - Detects **429 rate-limit** responses and shows 100% immediately
 - Caches the last known values so the menu bar stays populated even if an API call fails
 - Quick link to **Anthropic Console** usage dashboard in dropdown
@@ -74,7 +74,7 @@ SwiftBar will pick it up automatically on the next refresh cycle.
 
 1. **Reads the OAuth token** from the macOS Keychain (`Claude Code-credentials`).
 2. **Sends a minimal API request** to `api.anthropic.com` (a single-token Haiku call) just to receive rate-limit response headers. The token is passed securely via a temporary file, not exposed in process arguments.
-3. **Parses the headers** for `anthropic-ratelimit-unified-5h-utilization`, `anthropic-ratelimit-unified-7d-utilization`, and their corresponding reset timestamps.
+3. **Parses the headers** for `anthropic-ratelimit-unified-7d-utilization`, its reset timestamp, and the overage status.
 4. **Detects HTTP 429** responses and immediately shows 100% usage.
 5. **Caches the result** to `~/.claude/budget-cache.json` (with timestamp) so the display survives transient API failures.
 6. **Outputs SwiftBar-formatted text** with color coding for the menu bar title and dropdown.
