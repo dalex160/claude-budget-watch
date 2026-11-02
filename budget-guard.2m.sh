@@ -6,7 +6,7 @@
 #
 # Budget Guard — SwiftBar plugin (refreshes every 2 min)
 # Shows Claude Max usage in macOS menu bar.
-# Version: 1.0.0
+# Version: 1.1.0
 
 set -u
 
@@ -120,7 +120,7 @@ get_usage_from_headers() {
 
     if [[ "${http_code:-}" == "429" ]]; then
         log "Rate limited (429) — budget likely exhausted"
-        echo "1.0|1.0|1.0|now|now"
+        echo "1.0|now|?"
         return 0
     fi
 
@@ -129,32 +129,25 @@ get_usage_from_headers() {
         return 1
     fi
 
-    local u5 u7 reset5 reset7
-    u5=$(echo "$headers" | grep -i "anthropic-ratelimit-unified-5h-utilization" | tr -d '\r' | awk '{print $2}')
+    # Since late 2026 the 5-hour window is gone: only the 7-day window (and overage) remain.
+    local u7 reset7 uo ostatus oreason
     u7=$(echo "$headers" | grep -i "anthropic-ratelimit-unified-7d-utilization" | tr -d '\r' | awk '{print $2}')
-    reset5=$(echo "$headers" | grep -i "anthropic-ratelimit-unified-5h-reset" | tr -d '\r' | awk '{print $2}')
     reset7=$(echo "$headers" | grep -i "anthropic-ratelimit-unified-7d-reset" | tr -d '\r' | awk '{print $2}')
+    uo=$(echo "$headers" | grep -i "anthropic-ratelimit-unified-overage-utilization" | tr -d '\r' | awk '{print $2}')
+    ostatus=$(echo "$headers" | grep -i "anthropic-ratelimit-unified-overage-status" | tr -d '\r' | awk '{print $2}')
+    oreason=$(echo "$headers" | grep -i "anthropic-ratelimit-unified-overage-disabled-reason" | tr -d '\r' | awk '{print $2}')
 
-    # Validate extracted values
-    if ! is_number "${u5:-}" && ! is_number "${u7:-}"; then
-        log "No valid utilization headers found (u5='${u5:-}', u7='${u7:-}')"
+    if ! is_number "${u7:-}"; then
+        log "No valid 7d utilization header found (u7='${u7:-}')"
         return 1
     fi
+    is_number "${uo:-}" || uo="?"
 
-    # Default invalid values to 0
-    is_number "${u5:-}" || u5="0"
-    is_number "${u7:-}" || u7="0"
-
-    # Single python call for reset time formatting (pass values via sys.argv, not interpolation)
-    python3 - "$u5" "$u7" "${reset5:-0}" "${reset7:-0}" <<'PYEOF'
+    python3 - "$u7" "${reset7:-0}" "$uo" "${ostatus:-?}" "${oreason:-}" <<'PYEOF'
 import sys
 from datetime import datetime, timezone
 
-u5 = float(sys.argv[1])
-u7 = float(sys.argv[2])
-reset5_raw = sys.argv[3]
-reset7_raw = sys.argv[4]
-max_u = max(u5, u7)
+u7, reset7_raw, uo, ostatus, oreason = sys.argv[1:6]
 
 def fmt_reset(ts):
     if not ts or ts == '0':
@@ -163,94 +156,88 @@ def fmt_reset(ts):
         delta = int(ts) - datetime.now(timezone.utc).timestamp()
         if delta <= 0:
             return 'now'
-        h = int(delta) // 3600
+        d = int(delta) // 86400
+        h = (int(delta) % 86400) // 3600
         m = (int(delta) % 3600) // 60
+        if d > 0:
+            return f'{d}d {h}h'
         return f'{h}h {m}m' if h > 0 else f'{m}m'
     except (ValueError, TypeError):
         return '?'
 
-print(f'{u5}|{u7}|{max_u}|{fmt_reset(reset5_raw)}|{fmt_reset(reset7_raw)}')
+# Overage: utilization if reported, otherwise its status ("off: out_of_credits")
+if uo != '?':
+    overage = f'{round(float(uo) * 100)}%'
+elif ostatus == 'rejected':
+    overage = f'off ({oreason})' if oreason else 'off'
+else:
+    overage = ostatus
+print(f'{u7}|{fmt_reset(reset7_raw)}|{overage}')
 PYEOF
 }
 
 # --- Fetch data ---
 PARSED=$(get_usage_from_headers)
 if [[ $? -eq 0 && -n "${PARSED:-}" ]]; then
-    U5=$(echo "$PARSED" | cut -d'|' -f1)
-    U7=$(echo "$PARSED" | cut -d'|' -f2)
-    MAX_U=$(echo "$PARSED" | cut -d'|' -f3)
-    R5=$(echo "$PARSED" | cut -d'|' -f4)
-    R7=$(echo "$PARSED" | cut -d'|' -f5)
+    U7=$(echo "$PARSED" | cut -d'|' -f1)
+    R7=$(echo "$PARSED" | cut -d'|' -f2)
+    OV=$(echo "$PARSED" | cut -d'|' -f3)
 
     # Update cache with timestamp and secure permissions
-    python3 - "$MAX_U" "$U5" "$U7" "$R5" "$CACHE_FILE" <<'PYEOF'
-import json, sys
+    python3 - "$U7" "$R7" "$OV" "$CACHE_FILE" <<'PYEOF'
+import json, sys, os
 from datetime import datetime, timezone
-max_u, u5, u7, r5, cache_path = float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), sys.argv[4], sys.argv[5]
-import os
+u7, r7, ov, cache_path = float(sys.argv[1]), sys.argv[2], sys.argv[3], sys.argv[4]
 fd = os.open(cache_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
 with os.fdopen(fd, 'w') as f:
-    json.dump({'max_util': max_u, 'five_hour': u5, 'seven_day': u7, 'remaining': r5, 'updated_at': datetime.now(timezone.utc).isoformat()}, f)
+    json.dump({
+        'seven_day': u7,
+        'reset_7d': r7,
+        'overage': ov,
+        'updated_at': datetime.now(timezone.utc).isoformat(),
+    }, f)
 PYEOF
-    log "Cache updated: u5=$U5 u7=$U7"
+    log "Cache updated: u7=$U7 overage=$OV"
 else
-    # API failed — try reading existing cache
+    # API failed — try reading existing cache (tolerates the pre-1.1 cache format)
     if [[ -f "$CACHE_FILE" ]]; then
         CACHED=$(python3 - "$CACHE_FILE" <<'PYEOF'
 import json, sys
 d = json.load(open(sys.argv[1]))
-u5=d.get('five_hour',0); u7=d.get('seven_day',0); mx=d.get('max_util',0); r=d.get('remaining','?'); t=d.get('updated_at','?')
-print(f'{u5}|{u7}|{mx}|{r}|{r}|{t}')
+ov = d.get('overage', '?')
+if isinstance(ov, (int, float)):
+    ov = f'{round(ov * 100)}%'
+print(f"{d.get('seven_day', '?')}|{d.get('reset_7d', '?')}|{ov}|{d.get('updated_at', '?')}")
 PYEOF
         )
-        U5=$(echo "$CACHED" | cut -d'|' -f1)
-        U7=$(echo "$CACHED" | cut -d'|' -f2)
-        MAX_U=$(echo "$CACHED" | cut -d'|' -f3)
-        R5=$(echo "$CACHED" | cut -d'|' -f4)
-        R7=$(echo "$CACHED" | cut -d'|' -f5)
-        CACHE_AGE=$(echo "$CACHED" | cut -d'|' -f6)
-        log "Using cached data from $CACHE_AGE"
+        U7=$(echo "$CACHED" | cut -d'|' -f1)
+        R7=$(echo "$CACHED" | cut -d'|' -f2)
+        OV=$(echo "$CACHED" | cut -d'|' -f3)
+        log "Using cached data from $(echo "$CACHED" | cut -d'|' -f4)"
     else
-        MAX_U="?"
-        U5="?"
-        U7="?"
-        R5="?"
-        R7="?"
+        U7="?"; R7="?"; OV="?"
         log "No cache available, showing '?'"
     fi
 fi
 
-# --- Format percentages ---
-U5_PCT=$(fmt_pct "${U5:-?}")
+# --- Format percentage, color, notifications ---
 U7_PCT=$(fmt_pct "${U7:-?}")
+COLOR=$(get_color "$U7_PCT")
 
-# --- Determine max percentage for color ---
-if [[ "$U5_PCT" != "?" && "$U7_PCT" != "?" ]]; then
-    MAX_PCT=$(( U5_PCT > U7_PCT ? U5_PCT : U7_PCT ))
-else
-    MAX_PCT="?"
-fi
-
-COLOR=$(get_color "$MAX_PCT")
-
-# --- Send notifications if thresholds are crossed ---
-if [[ "$MAX_PCT" != "?" ]]; then
-    notify_threshold "$MAX_PCT" "$NOTIFY_WARN" "Warning (${NOTIFY_WARN}%)"
-    notify_threshold "$MAX_PCT" "$NOTIFY_CRIT" "Critical (${NOTIFY_CRIT}%)"
+if [[ "$U7_PCT" != "?" ]]; then
+    notify_threshold "$U7_PCT" "$NOTIFY_WARN" "Warning (${NOTIFY_WARN}%)"
+    notify_threshold "$U7_PCT" "$NOTIFY_CRIT" "Critical (${NOTIFY_CRIT}%)"
 fi
 
 # --- Menu bar title ---
-if [[ "$MAX_U" == "?" ]]; then
-    echo "CC: ? | size=13"
-else
-    echo "CC: ${U5_PCT}% / ${U7_PCT}% | size=13"
-fi
+echo "CC: ${U7_PCT}$([[ "$U7_PCT" != "?" ]] && echo %) | size=13"
 
 echo "---"
 
 # --- Usage details ---
-echo "5h window: ${U5_PCT}% (reset ${R5}) | size=12"
-echo "7d window: ${U7_PCT}% (reset ${R7}) | size=12"
+echo "Weekly usage: ${U7_PCT}$([[ "$U7_PCT" != "?" ]] && echo %) | size=12"
+echo "Resets in: ${R7} | size=12"
+echo "Overage: ${OV} | size=12"
 
 echo "---"
 
