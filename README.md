@@ -41,13 +41,7 @@ brew install budget-guard
 budget-guard-link                    # links the plugin into SwiftBar
 ```
 
-### Option B -- DMG installer
-
-1. Download the latest `.dmg` from the [Releases](https://github.com/dalex160/claude-budget-watch/releases) page
-2. Open the DMG and run **Install Budget Guard**
-3. The installer will set up SwiftBar (if needed) and install the plugin
-
-### Option C -- Symlink (recommended for developers)
+### Option B -- Symlink (recommended for developers)
 
 This way you can `git pull` updates without re-copying.
 
@@ -59,7 +53,7 @@ mkdir -p "$HOME/Library/Application Support/SwiftBar/Plugins"
 ln -sf ~/budget-guard/budget-guard.2m.sh "$HOME/Library/Application Support/SwiftBar/Plugins/budget-guard.2m.sh"
 ```
 
-### Option D -- Direct copy
+### Option C -- Direct copy
 
 ```bash
 git clone https://github.com/dalex160/claude-budget-watch.git ~/budget-guard
@@ -137,7 +131,7 @@ Notifications are sent once per threshold crossing and reset automatically when 
 
 ## Building the DMG
 
-To build a distributable DMG:
+The DMG is not published with releases (it is unsigned, so macOS Gatekeeper blocks it). To build one locally:
 
 ```bash
 ./build-dmg.sh
