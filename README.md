@@ -11,7 +11,7 @@ Budget Guard is a [SwiftBar](https://github.com/swiftbar/SwiftBar) plugin that d
 ## What it does
 
 - Shows your **weekly (7d)** usage percentage at a glance: `CC: 18%`
-- **Color-coded** display: green, yellow, orange, red depending on usage level
+- **Color-coded** display: light green, light orange, light red depending on usage level
 - **macOS notifications** when usage crosses 80% and 95% thresholds
 - Displays time until the weekly window resets, and whether overage is available in the dropdown
 - Detects **429 rate-limit** responses and shows 100% immediately
@@ -121,10 +121,9 @@ The menu bar text changes color based on the highest usage percentage:
 
 | Usage | Color |
 |---|---|
-| < 60% | Green |
-| 60-69% | Yellow |
-| 70-89% | Orange |
-| >= 90% | Red |
+| < 70% | Light green |
+| 70-89% | Light orange |
+| >= 90% | Light red |
 
 ## Notifications
 

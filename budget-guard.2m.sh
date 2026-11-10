@@ -52,10 +52,10 @@ fmt_pct() {
 get_color() {
     local pct="$1"
     if [[ "$pct" == "?" ]]; then echo "gray"; return; fi
-    if (( pct >= 90 )); then echo "red"
-    elif (( pct >= 70 )); then echo "orange"
-    elif (( pct >= 60 )); then echo "yellow"
-    else echo "green"
+    # Tones: <70% light green, 70-89% light orange, >=90% light red
+    if (( pct >= 90 )); then echo "#FF8080"
+    elif (( pct >= 70 )); then echo "#FFB866"
+    else echo "#9EF59E"
     fi
 }
 
@@ -230,7 +230,7 @@ if [[ "$U7_PCT" != "?" ]]; then
 fi
 
 # --- Menu bar title ---
-echo "CC: ${U7_PCT}$([[ "$U7_PCT" != "?" ]] && echo %) | size=13"
+echo "CC: ${U7_PCT}$([[ "$U7_PCT" != "?" ]] && echo %) | size=13 color=${COLOR}"
 
 echo "---"
 
