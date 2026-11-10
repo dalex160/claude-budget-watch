@@ -6,7 +6,7 @@
 #
 # Budget Guard — SwiftBar plugin (refreshes every 2 min)
 # Shows Claude Max usage in macOS menu bar.
-# Version: 1.1.0
+# Version: 1.2.0
 
 set -u
 
