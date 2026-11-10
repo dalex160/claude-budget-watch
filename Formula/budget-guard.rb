@@ -8,8 +8,8 @@
 class BudgetGuard < Formula
   desc "SwiftBar plugin showing Claude Max usage in the macOS menu bar"
   homepage "https://github.com/dalex160/claude-budget-watch"
-  url "https://github.com/dalex160/claude-budget-watch/archive/refs/tags/v1.1.0.tar.gz"
-  sha256 "7d3f043b4d7de992a63f5188b09a4704771b728f52ccef9fbade02a0d92324b1"
+  url "https://github.com/dalex160/claude-budget-watch/archive/refs/tags/v1.2.0.tar.gz"
+  sha256 "24624eeeebeaaef4aac09923f873acf223a578d097e6b284de6ff7afde473c00"
   license "MIT"
 
   depends_on :macos
