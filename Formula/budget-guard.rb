@@ -1,6 +1,6 @@
 # Homebrew formula for Budget Guard.
 # Tap: dalex160/budget-guard
-# Install: brew tap dalex160/budget-guard && brew install budget-guard
+# Install: brew tap dalex160/budget-guard && brew trust dalex160/budget-guard && brew install budget-guard
 #
 # SwiftBar runs plugins from ~/Library/Application Support/SwiftBar/Plugins/.
 # Homebrew's sandbox prevents writing there during post_install, so we ship

@@ -36,6 +36,7 @@ Budget Guard is a [SwiftBar](https://github.com/swiftbar/SwiftBar) plugin that d
 ```bash
 brew install --cask swiftbar        # if not already installed
 brew tap dalex160/budget-guard
+brew trust dalex160/budget-guard     # Homebrew requires trusting third-party taps
 brew install budget-guard
 budget-guard-link                    # links the plugin into SwiftBar
 ```
