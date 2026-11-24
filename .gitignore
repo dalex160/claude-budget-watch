@@ -3,3 +3,4 @@
 budget-cache.json
 .build-dmg/
 *.dmg
+.superpowers/
