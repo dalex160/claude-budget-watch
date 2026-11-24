@@ -13,6 +13,15 @@ die() { echo "REFUS : $*" >&2; exit 1; }
 [[ "$(git branch --show-current)" == "master" ]] || die "il faut être sur la branche master."
 command -v gh >/dev/null || die "gh (GitHub CLI) est absent."
 
+# Reprise : un commit de release déjà fait mais non poussé (le push a échoué la fois précédente).
+AHEAD=$(git rev-list --count origin/master..master 2>/dev/null || echo 0)
+if (( AHEAD > 0 )); then
+    echo "Des commits de master ne sont pas encore sur GitHub (le push précédent a sans doute échoué) : je les pousse, sans rien reconstruire."
+    git push origin master
+    echo "OK : commits poussés."
+    exit 0
+fi
+
 VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$ROOT/app/Resources/Info.plist")
 TAG="v$VERSION"
 [[ -s "$ROOT/scripts/sparkle-public-key.txt" ]] || die "scripts/sparkle-public-key.txt manque (étape propriétaire : générer la clé Sparkle avec generate_keys puis y coller la clé publique)."
@@ -53,13 +62,18 @@ mkdir -p "$ROOT/site"
 cp "$FEED_DIR/appcast.xml" "$ROOT/site/appcast.xml"
 
 # --- Publication ---
-if (( RELEASE_EXISTS == 0 )); then
-    # Nom stable pour le bouton « Télécharger » (releases/latest/download/BudgetGuard.dmg), en plus du nom versionné.
-    cp "$DMG" "$STABLE_DIR/BudgetGuard.dmg"
+# Nom stable pour le bouton « Télécharger » (releases/latest/download/BudgetGuard.dmg), en plus du nom versionné.
+cp "$DMG" "$STABLE_DIR/BudgetGuard.dmg"
+if (( RELEASE_EXISTS )); then
+    # Reprise : l'appcast est signé sur ce build, les fichiers publiés doivent donc être remplacés par ce même build.
+    gh release upload "$TAG" "$DMG" "$STABLE_DIR/BudgetGuard.dmg" --repo "$REPO" --clobber
+else
     gh release create "$TAG" "$DMG" "$STABLE_DIR/BudgetGuard.dmg" --repo "$REPO" --title "Budget Guard $VERSION" --generate-notes
 fi
 
-git add site/appcast.xml
-git commit -m "release: Budget Guard $VERSION" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+if ! git diff --quiet -- site/appcast.xml || [[ -n "$(git status --porcelain -- site/appcast.xml)" ]]; then
+    git add site/appcast.xml
+    git commit -m "release: Budget Guard $VERSION" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+fi
 git push origin master
 echo "OK : $TAG publiée, appcast mis à jour."
