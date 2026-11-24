@@ -15,6 +15,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var onboarding = OnboardingWindowController(notifier: notifier)
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        Updater.shared.start()
         render(snapshot: nil, error: nil)
         statusItem.onRefresh = { [weak self] in self?.loop.refreshNow() }
         statusItem.onReconnect = { [weak self] in self?.showOnboarding(startAt: .login) }

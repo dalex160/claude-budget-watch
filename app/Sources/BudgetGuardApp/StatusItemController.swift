@@ -57,7 +57,7 @@ final class StatusItemController: NSObject {
         launch.state = LoginItem.isEnabled ? .on : .off
         menu.addItem(launch)
         menu.addItem(.separator())
-        // « Rechercher des mises à jour… » ships with the Updater in Task 8.
+        menu.addItem(action("Rechercher des mises à jour…", #selector(checkForUpdates)))
         menu.addItem(NSMenuItem(title: "Quitter Budget Guard", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         return menu
     }
@@ -74,6 +74,7 @@ final class StatusItemController: NSObject {
         try? LoginItem.setEnabled(!LoginItem.isEnabled)
         refreshMenu()
     }
+    @objc private func checkForUpdates() { Updater.shared.checkForUpdates() }
     @objc private func enableAlerts() { onEnableAlerts?() }
 
     @objc private func useClaudeCode() {
