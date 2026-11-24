@@ -12,13 +12,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if SourceKind.current == .claudeCode { return self.claudeCodeSource }
         return self.webSource
     })
-    private var loginWindow: NSWindow?
-    private var login: LoginWebView?
+    private lazy var onboarding = OnboardingWindowController(notifier: notifier)
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         render(snapshot: nil, error: nil)
         statusItem.onRefresh = { [weak self] in self?.loop.refreshNow() }
-        statusItem.onReconnect = { [weak self] in self?.showLogin() }
+        statusItem.onReconnect = { [weak self] in self?.showOnboarding(startAt: .login) }
         statusItem.onUseClaudeCode = { [weak self] in self?.switchSource(.claudeCode) }
         statusItem.onEnableAlerts = { [weak self] in
             Task { @MainActor in
@@ -26,6 +25,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 _ = await self.notifier.requestAuthorization()
                 await self.updateAuthorization()
             }
+        }
+        if !UserDefaults.standard.bool(forKey: OnboardingWindowController.completedKey) {
+            showOnboarding(startAt: .welcome)
         }
         loop.onUpdate = { [weak self] snapshot, error in self?.handle(snapshot, error) }
         Task { @MainActor in
@@ -54,37 +56,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.refreshMenu()
     }
 
+    private func showOnboarding(startAt step: OnboardingStep) {
+        onboarding.show(startAt: step) { [weak self] in
+            guard let self else { return }
+            // The assistant may have changed the notification permission or logged in.
+            Task { @MainActor in await self.updateAuthorization() }
+            if self.onboarding.didLogIn { self.switchSource(.web) }
+        }
+    }
+
     private func switchSource(_ kind: SourceKind) {
         SourceKind.current = kind
         loop.resetSnapshot()
         render(snapshot: nil, error: nil)
         loop.refreshNow()
-    }
-
-    // Task 7 routes this to the onboarding.
-    private func showLogin() {
-        if let w = loginWindow { NSApp.activate(ignoringOtherApps: true); w.makeKeyAndOrderFront(nil); return }
-        let l = LoginWebView()
-        l.onLoggedIn = { [weak self] in self?.loginDone() }
-        let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 560, height: 800), styleMask: [.titled, .closable], backing: .buffered, defer: false)
-        w.title = "Se connecter à Claude"
-        w.isReleasedWhenClosed = false
-        w.contentView = l.view
-        w.center()
-        NSApp.activate(ignoringOtherApps: true)
-        w.makeKeyAndOrderFront(nil)
-        l.start()
-        login = l
-        loginWindow = w
-    }
-
-    private func loginDone() {
-        // Hide on the next turn: closing synchronously from the web view callback crashed in the spike.
-        DispatchQueue.main.async { [weak self] in
-            self?.loginWindow?.orderOut(nil)
-            self?.loginWindow = nil
-            self?.login = nil
-        }
-        switchSource(.web)
     }
 }

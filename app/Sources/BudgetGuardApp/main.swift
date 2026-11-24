@@ -4,6 +4,9 @@ let args = CommandLine.arguments
 if let i = args.firstIndex(of: "--probe"), i + 1 < args.count {
     MainActor.assumeIsolated { Probe.run(args[i + 1]) }
 }
+if let i = args.firstIndex(of: "--onboarding-preview"), i + 1 < args.count {
+    MainActor.assumeIsolated { OnboardingPreview.run(stepName: args[i + 1], args: args) }
+}
 if args.contains("--logout") {
     MainActor.assumeIsolated { LoginTest.logout() }
 }

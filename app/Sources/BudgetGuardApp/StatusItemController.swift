@@ -53,7 +53,9 @@ final class StatusItemController: NSObject {
         if !notificationsAuthorized {
             menu.addItem(action("Activer les alertes", #selector(enableAlerts)))
         }
-        // « Lancer au démarrage du Mac » intentionally omitted: it ships with the LoginItem in Task 7.
+        let launch = action("Lancer au démarrage du Mac", #selector(toggleLaunchAtLogin))
+        launch.state = LoginItem.isEnabled ? .on : .off
+        menu.addItem(launch)
         menu.addItem(.separator())
         // « Rechercher des mises à jour… » ships with the Updater in Task 8.
         menu.addItem(NSMenuItem(title: "Quitter Budget Guard", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
@@ -68,6 +70,10 @@ final class StatusItemController: NSObject {
 
     @objc private func refresh() { onRefresh?() }
     @objc private func reconnect() { onReconnect?() }
+    @objc private func toggleLaunchAtLogin() {
+        try? LoginItem.setEnabled(!LoginItem.isEnabled)
+        refreshMenu()
+    }
     @objc private func enableAlerts() { onEnableAlerts?() }
 
     @objc private func useClaudeCode() {

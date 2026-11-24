@@ -46,12 +46,12 @@ public enum Copy {
         "Vous avez utilisé \(percent)\(narrowSpace)% de votre limite de la semaine."
     }
 
-    static func usageSentence(_ percent: Int) -> String {
+    public static func usageSentence(_ percent: Int) -> String {
         "Vous avez utilisé \(percent)\(narrowSpace)% de votre limite de la semaine"
     }
 
     static let notLoggedIn = "Vous n’êtes plus connecté à Claude."
-    static let unsupportedPlan = "Budget Guard fonctionne avec les abonnements Claude Pro et Max."
+    public static let unsupportedPlan = "Budget Guard fonctionne avec les abonnements Claude Pro et Max."
 
     static func staleLine(_ fetchedAt: Date, calendar: Calendar) -> String {
         "Dernière mise à jour à \(clock(fetchedAt, calendar: calendar)) — connexion impossible"
