@@ -1,14 +1,22 @@
 # Budget Guard
 
-**Keep your Claude Max usage visible in the macOS menu bar.**
+**Télécharger : https://dalex160.github.io/claude-budget-watch/**
+
+Budget Guard est une application pour Mac qui affiche en permanence, dans la barre des menus, la part de votre forfait Claude utilisée cette semaine.
+Elle vous prévient à 80 % et à 95 %, et se met à jour toute seule.
+Elle s'installe en trois étapes expliquées sur la page de téléchargement.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+---
+
+## Ancienne version (SwiftBar)
 
 Budget Guard is a [SwiftBar](https://github.com/swiftbar/SwiftBar) plugin that displays your Claude Max weekly rate-limit consumption (Claude now uses a single 7-day window — the 5-hour window is gone) directly in the macOS menu bar. No more surprise throttles.
 
 ---
 
-## What it does
+### What it does
 
 - Shows your **weekly (7d)** usage percentage at a glance: `CC: 18%`
 - **Color-coded** display: light green, light orange, light red depending on usage level
@@ -19,7 +27,7 @@ Budget Guard is a [SwiftBar](https://github.com/swiftbar/SwiftBar) plugin that d
 - Quick link to **Anthropic Console** usage dashboard in dropdown
 - Refreshes automatically every 2 minutes
 
-## Prerequisites
+### Prerequisites
 
 | Requirement | Notes |
 |---|---|
@@ -29,7 +37,7 @@ Budget Guard is a [SwiftBar](https://github.com/swiftbar/SwiftBar) plugin that d
 | **python3** | Ships with macOS (used for JSON parsing and time formatting) |
 | **Claude Code** | Must have been authenticated at least once so the OAuth token is in Keychain |
 
-## Installation
+### Installation
 
 ### Option A -- Homebrew (recommended)
 
@@ -65,7 +73,7 @@ chmod +x "$HOME/Library/Application Support/SwiftBar/Plugins/budget-guard.2m.sh"
 
 SwiftBar will pick it up automatically on the next refresh cycle.
 
-## How it works
+### How it works
 
 1. **Reads the OAuth token** from the macOS Keychain (`Claude Code-credentials`).
 2. **Sends a minimal API request** to `api.anthropic.com` (a single-token Haiku call) just to receive rate-limit response headers. The token is passed securely via a temporary file, not exposed in process arguments.
@@ -74,7 +82,7 @@ SwiftBar will pick it up automatically on the next refresh cycle.
 5. **Caches the result** to `~/.claude/budget-cache.json` (with timestamp) so the display survives transient API failures.
 6. **Outputs SwiftBar-formatted text** with color coding for the menu bar title and dropdown.
 
-## Configuration
+### Configuration
 
 All configuration constants are at the top of the script for easy editing:
 
@@ -110,7 +118,7 @@ Logs are written to `~/.claude/budget-guard.log`.
 
 The cache is stored at `~/.claude/budget-cache.json` with `600` permissions. You can delete it safely -- it will be recreated on the next successful API call.
 
-## Color coding
+### Color coding
 
 The menu bar text changes color based on the highest usage percentage:
 
@@ -120,7 +128,7 @@ The menu bar text changes color based on the highest usage percentage:
 | 70-89% | Light orange |
 | >= 90% | Light red |
 
-## Notifications
+### Notifications
 
 Budget Guard sends macOS notifications when usage crosses configured thresholds:
 
@@ -129,7 +137,7 @@ Budget Guard sends macOS notifications when usage crosses configured thresholds:
 
 Notifications are sent once per threshold crossing and reset automatically when usage drops below the threshold.
 
-## Building the DMG
+### Building the DMG
 
 The DMG is not published with releases (it is unsigned, so macOS Gatekeeper blocks it). To build one locally:
 
@@ -139,6 +147,6 @@ The DMG is not published with releases (it is unsigned, so macOS Gatekeeper bloc
 
 This creates `Budget-Guard-Installer.dmg` in the project root.
 
-## License
+### License
 
 MIT -- see [LICENSE](LICENSE).
