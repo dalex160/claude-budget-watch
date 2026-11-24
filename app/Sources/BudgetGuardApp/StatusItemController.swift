@@ -8,7 +8,7 @@ final class StatusItemController: NSObject {
     var onRefresh: (() -> Void)?
     var onUseClaudeCode: (() -> Void)?
     var onEnableAlerts: (() -> Void)?
-    var notificationsAuthorized = true
+    var notificationsAuthorized = false
 
     private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private var last: MenuDisplay?

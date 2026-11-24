@@ -11,8 +11,7 @@ final class RefreshLoop {
     private let interval: TimeInterval
     private var timer: Timer?
     private var wakeObserver: NSObjectProtocol?
-    private var inFlight = false
-    private var rerun = false
+    private var gate = RefreshGate()
     private var lastSnapshot: UsageSnapshot?
 
     init(sourceProvider: @escaping () -> UsageSource, interval: TimeInterval = 120) {
@@ -22,9 +21,12 @@ final class RefreshLoop {
 
     func start() {
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
+        // .common so it keeps firing while the menu is open (event-tracking run loop mode).
+        let t = Timer(timeInterval: interval, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.refreshNow() }
         }
+        RunLoop.main.add(t, forMode: .common)
+        timer = t
         wakeObserver = NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
         ) { [weak self] _ in
@@ -36,12 +38,14 @@ final class RefreshLoop {
         refreshNow()
     }
 
-    /// Forget the last value (the source changed, the old number no longer applies).
-    func resetSnapshot() { lastSnapshot = nil }
+    /// Forget the last value (the source changed): any fetch still in flight is dropped when it completes.
+    func resetSnapshot() {
+        lastSnapshot = nil
+        gate.reset()
+    }
 
     func refreshNow() {
-        guard !inFlight else { rerun = true; return }
-        inFlight = true
+        guard let token = gate.request() else { return }
         let source = sourceProvider()
         Task { @MainActor [weak self] in
             var fresh: UsageSnapshot?
@@ -54,10 +58,12 @@ final class RefreshLoop {
                 failure = .network
             }
             guard let self else { return }
-            self.inFlight = false
-            if let fresh { self.lastSnapshot = fresh }
-            self.onUpdate?(fresh ?? self.lastSnapshot, failure)
-            if self.rerun { self.rerun = false; self.refreshNow() }
+            let outcome = self.gate.complete(token)
+            if outcome.accept {
+                if let fresh { self.lastSnapshot = fresh }
+                self.onUpdate?(fresh ?? self.lastSnapshot, failure)
+            }
+            if outcome.rerun { self.refreshNow() }
         }
     }
 }

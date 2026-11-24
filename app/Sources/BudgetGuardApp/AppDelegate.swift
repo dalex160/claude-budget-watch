@@ -36,7 +36,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func handle(_ snapshot: UsageSnapshot?, _ error: UsageFetchError?) {
         render(snapshot: snapshot, error: error)
-        guard let percent = alertPercent(snapshot: snapshot, error: error) else { return }
+        // Consult the tracker only when a notification can actually be shown, otherwise the crossing
+        // would be marked as announced and never delivered after « Activer les alertes ».
+        guard statusItem.notificationsAuthorized,
+              let percent = alertPercent(snapshot: snapshot, error: error) else { return }
         for threshold in alerts.thresholdsToAlert(for: percent) {
             notifier.post(threshold: threshold, percent: percent)
         }
