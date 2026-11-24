@@ -46,7 +46,12 @@ Mini-app Swift avec une fenêtre web intégrée (WKWebView), session non persist
 
 - La page de connexion claude.ai s'affiche normalement, en français, sans blocage anti-robot (Cloudflare). Boutons présents : Google, Apple, e-mail, SSO.
 - **« Continuer avec Google » ouvre bien la page de connexion Google** (« Accéder à l'application Claude »), avec l'identité de navigateur par défaut comme avec une identité Safari. Pas d'erreur « navigateur non sécurisé » à ce stade.
-- **Non vérifié** (nécessite un vrai compte, donc Alexis) : que Google ne refuse pas après la saisie de l'adresse ; la connexion par code mail ; la lecture effective du pourcentage une fois connecté ; la connexion par code mail d'un compte créé avec Google.
+Essai réel avec le compte d'Alexis (2026-11-24) :
+
+- **Connexion Google : réussie**, à une réserve près. Google propose d'abord la clé d'accès (passkey), qui échoue dans la fenêtre de l'app (message « Assurez-vous que le Bluetooth est activé… ») : une app sans autorisation Apple dédiée ne peut pas utiliser les passkeys. « Essayer une autre méthode » → mot de passe + confirmation sur téléphone → OK. L'assistant doit annoncer ce cas.
+- Google ouvre une **vraie fenêtre secondaire** (window.open) qui renvoie le résultat à claude.ai puis se ferme : l'app doit gérer ces fenêtres secondaires (créer, afficher, fermer sans libérer la fenêtre pendant le rappel — l'essai a planté là au premier passage).
+- **Connexion par code mail : réussie**, y compris avec l'adresse Gmail d'un compte créé via Google. C'est le chemin de secours universel.
+- **Lecture du pourcentage : réussie** depuis la page claude.ai (fetch dans la page, aucun cookie extrait) : `seven_day.utilization` = 29, `resets_at` = 2026-11-28T13:00Z, `five_hour` = null (fenêtre de 5 h supprimée), `extra_usage.is_enabled` = false avec `disabled_reason`. Le compte a 2 organisations ; la règle « première avec la capacité chat » choisit la bonne (capacités `chat`, `claude_max`).
 
 ## Approches envisagées
 
