@@ -39,7 +39,7 @@ Budget Guard is a [SwiftBar](https://github.com/swiftbar/SwiftBar) plugin that d
 
 ### Installation
 
-### Option A -- Homebrew (recommended)
+#### Option A -- Homebrew (recommended)
 
 ```bash
 brew install --cask swiftbar        # if not already installed
@@ -49,7 +49,7 @@ brew install budget-guard
 budget-guard-link                    # links the plugin into SwiftBar
 ```
 
-### Option B -- Symlink (recommended for developers)
+#### Option B -- Symlink (recommended for developers)
 
 This way you can `git pull` updates without re-copying.
 
@@ -61,7 +61,7 @@ mkdir -p "$HOME/Library/Application Support/SwiftBar/Plugins"
 ln -sf ~/budget-guard/budget-guard.2m.sh "$HOME/Library/Application Support/SwiftBar/Plugins/budget-guard.2m.sh"
 ```
 
-### Option C -- Direct copy
+#### Option C -- Direct copy
 
 ```bash
 git clone https://github.com/dalex160/claude-budget-watch.git ~/budget-guard

@@ -7,3 +7,4 @@ budget-cache.json
 
 app/.build/
 dist/
+.metadata_never_index

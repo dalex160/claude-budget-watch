@@ -17,10 +17,11 @@ h1{font-size:2.2rem;margin:0}
 ol{list-style:none;margin:0 0 20px;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 li{background:var(--card);border-radius:14px;padding:12px;text-align:left}
 li img{width:100%;height:auto;border-radius:8px;display:block;margin-bottom:10px}
-li p{margin:0;font-size:1rem;line-height:1.4}
-.btn{display:inline-block;background:var(--accent);color:var(--accent-fg);font-size:1.5rem;font-weight:700;text-decoration:none;padding:16px 36px;border-radius:14px}
+li p{margin:0;font-size:1.125rem;line-height:1.4}
+.btn{margin-top:4px;display:inline-block;background:var(--accent);color:var(--accent-fg);font-size:1.5rem;font-weight:700;text-decoration:none;padding:16px 36px;border-radius:14px}
 .btn:focus-visible{outline:4px solid var(--fg);outline-offset:3px}
-.small{color:var(--muted);margin:10px 0 0;font-size:1rem}
+.small{color:var(--muted);margin:10px 0 0;font-size:1.125rem}
+h2{font-size:1.5rem;margin:22px 0 4px}.lead2{font-size:1.125rem;margin:0 0 14px}ol{margin-bottom:0}
 @media (max-width:760px){ol{grid-template-columns:1fr}}
 </style>
 </head>
@@ -28,13 +29,15 @@ li p{margin:0;font-size:1rem;line-height:1.4}
 <main>
 <header><img src="img/icon.png" alt=""><h1>Budget Guard</h1></header>
 <p class="lead">Budget Guard affiche en haut de votre écran la part de votre forfait Claude que vous avez déjà utilisée cette semaine.</p>
+<a class="btn" href="https://github.com/dalex160/claude-budget-watch/releases/latest/download/BudgetGuard.dmg">Télécharger Budget Guard</a>
+<p class="small">Nécessite macOS 13 ou plus récent.</p>
+<h2>Ensuite, pour l’ouvrir la première fois</h2>
+<p class="lead2">Ouvrez le fichier téléchargé, puis glissez Budget Guard dans le dossier Applications.</p>
 <ol>
 <li><img src="img/ouvrir-1.png" alt="Alerte macOS : l’application n’a pas pu être ouverte"><p>1. Double-cliquez sur Budget Guard. macOS refuse de l’ouvrir la première fois : c’est normal.</p></li>
 <li><img src="img/ouvrir-2.png" alt="Réglages Système, Confidentialité et sécurité, bouton Ouvrir quand même"><p>2. Ouvrez Réglages Système &gt; Confidentialité et sécurité, descendez et cliquez sur « Ouvrir quand même ».</p></li>
 <li><img src="img/ouvrir-3.png" alt="Fenêtre de confirmation"><p>3. Confirmez. Budget Guard vous guide ensuite.</p></li>
 </ol>
-<a class="btn" href="https://github.com/dalex160/claude-budget-watch/releases/latest/download/BudgetGuard.dmg">Télécharger Budget Guard</a>
-<p class="small">Nécessite macOS 13 ou plus récent.</p>
 </main>
 </body>
 </html>
