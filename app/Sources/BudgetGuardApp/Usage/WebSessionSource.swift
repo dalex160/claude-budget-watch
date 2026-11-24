@@ -13,6 +13,9 @@ final class WebSessionSource: NSObject, UsageSource, WKNavigationDelegate {
     private var loadedAt: Date?
     private var pendingLoad: [CheckedContinuation<Void, Never>] = []
     private var loading = false
+    private var lastLoadSucceeded = false
+    private var loadTimeout: Task<Void, Never>?
+    private static let loadTimeoutSeconds: Double = 20
 
     init(dataStore: WKWebsiteDataStore? = nil) {
         let cfg = WKWebViewConfiguration()
@@ -38,6 +41,7 @@ final class WebSessionSource: NSObject, UsageSource, WKNavigationDelegate {
         catch UsageParseError.noOrganization { throw UsageFetchError.unsupportedPlan }
         catch { throw UsageFetchError.malformed }
 
+        guard OrganizationID.isSafe(uuid) else { throw UsageFetchError.malformed }
         let usage = try await fetchJSON(path: "/api/organizations/\(uuid)/usage")
         if let e = ResponseClassifier.error(status: usage.status, body: usage.body) { throw e }
         do { return try UsageParser.snapshot(fromUsageJSON: Data(usage.body.utf8), now: Date()) }
@@ -48,25 +52,34 @@ final class WebSessionSource: NSObject, UsageSource, WKNavigationDelegate {
     // MARK: - Page lifecycle
 
     private func ensurePage() async -> Bool {
-        let onClaude = webView.url?.host == "claude.ai"
         let fresh = loadedAt.map { Date().timeIntervalSince($0) < Self.maxPageAge } ?? false
-        if onClaude && fresh && !webView.isLoading { return true }
-        if onClaude && fresh && webView.isLoading { await waitForLoad(); return webView.url?.host == "claude.ai" }
+        if webView.url?.host == "claude.ai" && fresh && !webView.isLoading && !loading { return true }
         if !loading {
             loading = true
             webView.load(URLRequest(url: Self.home))
+            loadTimeout = Task { [weak self] in
+                try? await Task.sleep(nanoseconds: UInt64(Self.loadTimeoutSeconds * 1_000_000_000))
+                guard !Task.isCancelled else { return }
+                self?.webView.stopLoading()
+                self?.finishLoad(success: false)
+            }
         }
         await waitForLoad()
-        return webView.url?.host == "claude.ai"
+        return lastLoadSucceeded && webView.url?.host == "claude.ai"
     }
 
     private func waitForLoad() async {
         await withCheckedContinuation { pendingLoad.append($0) }
     }
 
+    /// Resolves every waiter exactly once; ignored when no load is in flight.
     private func finishLoad(success: Bool) {
+        guard loading else { return }
         loading = false
-        if success { loadedAt = Date() }
+        loadTimeout?.cancel()
+        loadTimeout = nil
+        lastLoadSucceeded = success
+        loadedAt = success ? Date() : nil
         let waiting = pendingLoad
         pendingLoad = []
         waiting.forEach { $0.resume() }
@@ -76,12 +89,17 @@ final class WebSessionSource: NSObject, UsageSource, WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { finishLoad(success: false) }
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { finishLoad(success: false) }
 
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        loadedAt = nil
+        finishLoad(success: false)
+    }
+
     // MARK: - In-page fetch
 
     /// One GET inside the page; returns the raw status and (truncated) body. JS failure (offline) -> `.network`.
     private func fetchJSON(path: String) async throws -> (status: Int, body: String) {
         let js = """
-        const r = await fetch(path, {headers: {accept: 'application/json'}, credentials: 'include'});
+        const r = await fetch(path, {headers: {accept: 'application/json'}, credentials: 'include', signal: AbortSignal.timeout(20000)});
         const t = await r.text();
         return JSON.stringify({status: r.status, body: t.slice(0, \(Self.maxBody))});
         """
