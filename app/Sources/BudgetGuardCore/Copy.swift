@@ -3,6 +3,8 @@ import Foundation
 public enum Copy {
     static let narrowSpace = "\u{202F}"
 
+    public static let loading = "Chargement…"
+
     public static func percentTitle(_ percent: Int?) -> String {
         guard let percent else { return "—" }
         return "\(percent)\(narrowSpace)%"
