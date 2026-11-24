@@ -31,6 +31,12 @@ public enum OnboardingFlow {
         }
     }
 
+    /// « Se reconnecter » shortcut only applies once the first-run assistant was completed;
+    /// otherwise the full first-run flow runs (settings included).
+    public static func isReconnect(startAt step: OnboardingStep, completed: Bool) -> Bool {
+        step == .login && completed
+    }
+
     /// Only finishing the last step marks the assistant as completed; any earlier close shows it again next launch.
     public static func marksCompleted(closingFrom step: OnboardingStep) -> Bool { step == .done }
 }

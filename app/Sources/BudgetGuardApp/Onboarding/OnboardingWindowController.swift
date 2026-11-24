@@ -9,6 +9,8 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
 
     /// True once the user got through the login step during the last `show`.
     private(set) var didLogIn = false
+    /// Fired as soon as the login step succeeds (before the assistant closes).
+    var onLoggedIn: (() -> Void)?
 
     private let notifier: Notifier
     private let model = OnboardingModel()
@@ -34,7 +36,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
         self.completion = completion
         finished = false
         didLogIn = false
-        reconnect = step == .login
+        reconnect = OnboardingFlow.isReconnect(startAt: step, completed: UserDefaults.standard.bool(forKey: Self.completedKey))
         // An accessory app's window stays behind other apps; become a regular app while the assistant is open.
         previousPolicy = NSApp.activationPolicy()
         NSApp.setActivationPolicy(.regular)
@@ -62,7 +64,7 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
         let l = LoginWebView()
         l.onLoggedIn = { [weak self] in
             // Leave the web view's callback before changing the hierarchy that hosts it.
-            DispatchQueue.main.async { self?.didLogIn = true; self?.handle(.loggedIn) }
+            DispatchQueue.main.async { self?.didLogIn = true; self?.onLoggedIn?(); self?.handle(.loggedIn) }
         }
         login = l
         model.loginView = l.view

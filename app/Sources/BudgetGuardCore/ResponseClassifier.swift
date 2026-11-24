@@ -13,4 +13,10 @@ public enum ResponseClassifier {
         default: return .network
         }
     }
+
+    /// Login detection: a session is valid when the organizations endpoint answers 2xx, whatever the plan
+    /// (a Free/Team account must still reach the assistant's check step, which explains the plan).
+    public static func sessionIsValid(status: Int, body: String) -> Bool {
+        error(status: status, body: body) == nil
+    }
 }

@@ -15,4 +15,12 @@ final class ResponseClassifierTests: XCTestCase {
     }
     func test429IsRateLimited() { XCTAssertEqual(ResponseClassifier.error(status: 429, body: ""), .rateLimited) }
     func test500IsNetwork() { XCTAssertEqual(ResponseClassifier.error(status: 500, body: ""), .network) }
+
+    func testSessionValidityDependsOnlyOnOrganizationsAnswer() {
+        // Login detection must not depend on the plan: any 2xx on the organizations endpoint is a valid session.
+        XCTAssertTrue(ResponseClassifier.sessionIsValid(status: 200, body: "[]"))
+        XCTAssertFalse(ResponseClassifier.sessionIsValid(status: 401, body: ""))
+        XCTAssertFalse(ResponseClassifier.sessionIsValid(status: 403, body: ""))
+        XCTAssertFalse(ResponseClassifier.sessionIsValid(status: 500, body: ""))
+    }
 }

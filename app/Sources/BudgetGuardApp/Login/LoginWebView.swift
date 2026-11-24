@@ -12,6 +12,9 @@ final class LoginWebView: NSObject, WKNavigationDelegate, WKUIDelegate, NSWindow
 
     private let webView: WKWebView
     private let source: WebSessionSource
+    static let offlineMessage = "Impossible d’afficher la page de connexion. Vérifiez votre connexion Internet."
+    private var offlineView: NSStackView?
+    private var retryButton: NSButton?
     private var popups: [NSWindow] = []
     private var timer: Timer?
     private var checking = false
@@ -55,7 +58,21 @@ final class LoginWebView: NSObject, WKNavigationDelegate, WKUIDelegate, NSWindow
         separator.boxType = .separator
         separator.translatesAutoresizingMaskIntoConstraints = false
 
-        let stack = NSStackView(views: [banner, separator, webView])
+        let errorLabel = NSTextField(wrappingLabelWithString: Self.offlineMessage)
+        errorLabel.font = .systemFont(ofSize: 14)
+        errorLabel.alignment = .center
+        let retry = NSButton(title: "Réessayer", target: nil, action: nil)
+        retry.bezelStyle = .rounded
+        let errorStack = NSStackView(views: [errorLabel, retry])
+        errorStack.orientation = .vertical
+        errorStack.spacing = 14
+        errorStack.edgeInsets = NSEdgeInsets(top: 40, left: 32, bottom: 40, right: 32)
+        errorStack.isHidden = true
+        errorStack.translatesAutoresizingMaskIntoConstraints = false
+        offlineView = errorStack
+        retryButton = retry
+
+        let stack = NSStackView(views: [banner, separator, errorStack, webView])
         stack.orientation = .vertical
         stack.alignment = .leading
         stack.spacing = 0
@@ -64,11 +81,37 @@ final class LoginWebView: NSObject, WKNavigationDelegate, WKUIDelegate, NSWindow
         banner.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
         separator.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
         webView.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
+        errorStack.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
         webView.setContentHuggingPriority(.defaultLow, for: .vertical)
         view = stack
         super.init()
         webView.navigationDelegate = self
         webView.uiDelegate = self
+        retryButton?.target = self
+        retryButton?.action = #selector(retryLoad)
+    }
+
+    @objc private func retryLoad() {
+        showOffline(false)
+        webView.load(URLRequest(url: Self.loginURL))
+    }
+
+    private func showOffline(_ on: Bool) {
+        offlineView?.isHidden = !on
+        webView.isHidden = on
+    }
+
+    // MARK: - Offline
+
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { navigationFailed(webView, error) }
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { navigationFailed(webView, error) }
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        if webView === self.webView { showOffline(false) }
+    }
+
+    private func navigationFailed(_ failed: WKWebView, _ error: Error) {
+        guard failed === webView, (error as NSError).code != NSURLErrorCancelled else { return }
+        showOffline(true)
     }
 
     deinit { MainActor.assumeIsolated { timer?.invalidate() } }
@@ -91,7 +134,7 @@ final class LoginWebView: NSObject, WKNavigationDelegate, WKUIDelegate, NSWindow
         checking = true
         Task { @MainActor [weak self] in
             guard let self else { return }
-            let ok = (try? await self.source.fetchSnapshot()) != nil
+            let ok = await self.source.hasSession()
             self.checking = false
             guard ok, !self.finished else { return }
             self.finished = true

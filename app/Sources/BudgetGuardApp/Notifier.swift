@@ -15,9 +15,13 @@ final class Notifier {
         return (try? await center.requestAuthorization(options: [.alert, .sound])) ?? false
     }
 
+    func authorizationStatus() async -> UNAuthorizationStatus? {
+        guard let center else { return nil }
+        return await center.notificationSettings().authorizationStatus
+    }
+
     func isAuthorized() async -> Bool {
-        guard let center else { return false }
-        let status = await center.notificationSettings().authorizationStatus
+        let status = await authorizationStatus()
         return status == .authorized || status == .provisional
     }
 

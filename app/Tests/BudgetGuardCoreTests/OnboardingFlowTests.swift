@@ -55,4 +55,11 @@ final class OnboardingFlowTests: XCTestCase {
             XCTAssertEqual(OnboardingFlow.marksCompleted(closingFrom: step), step == .done)
         }
     }
+
+    func testReconnectOnlyWhenOnboardingCompleted() {
+        XCTAssertTrue(OnboardingFlow.isReconnect(startAt: .login, completed: true))
+        XCTAssertFalse(OnboardingFlow.isReconnect(startAt: .login, completed: false))
+        XCTAssertFalse(OnboardingFlow.isReconnect(startAt: .welcome, completed: true))
+        XCTAssertFalse(OnboardingFlow.isReconnect(startAt: .welcome, completed: false))
+    }
 }

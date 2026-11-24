@@ -32,7 +32,8 @@ public func makeMenuModel(snapshot: UsageSnapshot?, error: UsageFetchError?, now
     }
 
     guard let snapshot else {
-        return MenuModel(title: Copy.percentTitle(nil), level: nil, isStale: true, lines: [], showsReconnect: false)
+        return MenuModel(title: Copy.percentTitle(nil), level: nil, isStale: true,
+                         lines: error == nil ? [] : [Copy.unavailable], showsReconnect: false)
     }
 
     var lines = [Copy.usageSentence(snapshot.weeklyPercent)]

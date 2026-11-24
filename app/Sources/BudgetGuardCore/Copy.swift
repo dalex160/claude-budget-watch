@@ -4,6 +4,7 @@ public enum Copy {
     static let narrowSpace = "\u{202F}"
 
     public static let loading = "Chargement…"
+    public static let unavailable = "Connexion impossible pour le moment"
 
     public static func percentTitle(_ percent: Int?) -> String {
         guard let percent else { return "—" }

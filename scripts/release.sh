@@ -24,6 +24,14 @@ fi
 
 VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$ROOT/app/Resources/Info.plist")
 TAG="v$VERSION"
+BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$ROOT/app/Resources/Info.plist")
+# Sparkle compares CFBundleVersion (sparkle:version), not the displayed version: it must grow with every release.
+if [[ -f "$ROOT/site/appcast.xml" ]]; then
+    HIGHEST=$(grep -oE 'sparkle:version(>|=")[0-9]+' "$ROOT/site/appcast.xml" | grep -oE '[0-9]+$' | sort -n | tail -1 || true)
+    if [[ -n "$HIGHEST" ]]; then
+        [[ "$BUILD" =~ ^[0-9]+$ ]] && (( BUILD > HIGHEST )) || die "le numéro de build ($BUILD) doit être supérieur à celui déjà publié ($HIGHEST), sinon les Mac déjà installés ne verront jamais la mise à jour. Augmentez CFBundleVersion et CFBundleShortVersionString dans app/Resources/Info.plist, puis recommencez."
+    fi
+fi
 [[ -s "$ROOT/scripts/sparkle-public-key.txt" ]] || die "scripts/sparkle-public-key.txt manque (étape propriétaire : générer la clé Sparkle avec generate_keys puis y coller la clé publique)."
 IDENTITIES=$(security find-identity -p codesigning 2>/dev/null || true)
 [[ "$IDENTITIES" == *"Budget Guard Signing"* ]] || die "identité \"Budget Guard Signing\" absente (étape propriétaire : lancer scripts/setup-signing.sh)."

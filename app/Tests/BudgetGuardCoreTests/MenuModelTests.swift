@@ -66,4 +66,14 @@ final class MenuModelTests: XCTestCase {
         XCTAssertFalse(m.showsReconnect)
         XCTAssertEqual(m.lines, ["Budget Guard fonctionne avec les abonnements Claude Pro et Max."])
     }
+
+    func testErrorBeforeFirstReadingShowsUnavailableLine() {
+        for e in [UsageFetchError.network, .cloudflare, .malformed] {
+            let m = makeMenuModel(snapshot: nil, error: e, now: now, calendar: calendar)
+            XCTAssertEqual(m.lines, ["Connexion impossible pour le moment"])
+            XCTAssertTrue(m.isStale)
+            XCTAssertEqual(m.title, "—")
+            XCTAssertFalse(m.showsReconnect)
+        }
+    }
 }

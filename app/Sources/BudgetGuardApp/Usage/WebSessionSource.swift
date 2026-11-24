@@ -29,7 +29,7 @@ final class WebSessionSource: NSObject, UsageSource, WKNavigationDelegate {
     func hasSession() async -> Bool {
         guard await ensurePage() else { return false }
         guard let r = try? await fetchJSON(path: "/api/organizations") else { return false }
-        return ResponseClassifier.error(status: r.status, body: r.body) == nil
+        return ResponseClassifier.sessionIsValid(status: r.status, body: r.body)
     }
 
     func fetchSnapshot() async throws -> UsageSnapshot {

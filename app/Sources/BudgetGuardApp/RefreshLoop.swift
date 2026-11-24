@@ -7,6 +7,8 @@ import BudgetGuardCore
 final class RefreshLoop {
     var onUpdate: ((UsageSnapshot?, UsageFetchError?) -> Void)?
 
+    /// A suspended or dead web process must not freeze the percentage: give up and show it greyed.
+    private static let fetchTimeout: Double = 45
     private let sourceProvider: () -> UsageSource
     private let interval: TimeInterval
     private var timer: Timer?
@@ -51,7 +53,7 @@ final class RefreshLoop {
             var fresh: UsageSnapshot?
             var failure: UsageFetchError?
             do {
-                fresh = try await source.fetchSnapshot()
+                fresh = try await withTimeout(seconds: Self.fetchTimeout) { try await source.fetchSnapshot() }
             } catch let e as UsageFetchError {
                 failure = e
             } catch {

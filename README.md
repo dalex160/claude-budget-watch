@@ -10,6 +10,16 @@ Elle s'installe en trois étapes expliquées sur la page de téléchargement.
 
 ---
 
+## Sauvegarder les clés (propriétaire)
+
+Deux secrets n’existent que dans le trousseau de ce Mac. Les perdre casse les mises à jour : les Mac déjà équipés refuseraient toute nouvelle version.
+Les exporter une fois, vers un endroit hors OneDrive (clé USB chiffrée, gestionnaire de mots de passe) :
+
+- Clé privée Sparkle : `generate_keys -x <fichier>` (l’outil est dans `app/.build/artifacts/`, dossier `sparkle`). Pour la restaurer : `generate_keys -f <fichier>`.
+- Certificat « Budget Guard Signing » : Trousseaux d’accès, catégorie « Mes certificats », clic droit sur « Budget Guard Signing », « Exporter… », format `.p12`, avec un mot de passe.
+
+---
+
 ## Ancienne version (SwiftBar)
 
 Budget Guard is a [SwiftBar](https://github.com/swiftbar/SwiftBar) plugin that displays your Claude Max weekly rate-limit consumption (Claude now uses a single 7-day window — the 5-hour window is gone) directly in the macOS menu bar. No more surprise throttles.
