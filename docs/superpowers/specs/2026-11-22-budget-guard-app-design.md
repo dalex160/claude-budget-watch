@@ -1,6 +1,6 @@
 # Budget Guard — application Mac native avec installation guidée
 
-Date : 2026-11-22 · Statut : brouillon, en attente d'approbation d'Alexis
+Date : 2026-11-22 · Statut : approuvé par Alexis le 2026-11-24
 
 ## Intention
 
@@ -67,7 +67,7 @@ Essai réel avec le compte d'Alexis (2026-11-24) :
 - Fonctionne pour les utilisateurs de l'application Claude / du site, connexion Google et e-mail.
 - Affichage et alertes identiques au plugin actuel (voir Objectifs).
 
-## Propositions de Claude (non validées par Alexis)
+## Propositions de Claude (validées par Alexis le 2026-11-24)
 
 - **Un seul chemin de connexion pour tout le monde : la fenêtre de connexion claude.ai intégrée.** Raison : la limite est la même pour tout le compte, donc un utilisateur de Claude Code peut aussi se connecter ainsi ; on évite la demande d'accès au trousseau (effrayante, et à répéter à chaque mise à jour pour une app non notarisée) et le risque de déconnecter Claude Code en rafraîchissant son jeton. Conséquence : on abandonne la lecture du jeton Claude Code.
 - La session reste stockée dans le stockage web propre à l'app ; les appels d'usage sont faits **depuis la page claude.ai elle-même** (fenêtre web cachée), pour réutiliser naturellement la session et les cookies anti-robot plutôt que d'extraire le cookie.
@@ -78,7 +78,7 @@ Essai réel avec le compte d'Alexis (2026-11-24) :
 - Même dépôt GitHub public que le plugin ; le plugin SwiftBar reste disponible pour l'existant (dont Alexis) jusqu'à ce que l'app le remplace.
 - Rafraîchissement toutes les 2 minutes, comme aujourd'hui ; en cas d'échec, garder la dernière valeur connue en la grisant.
 
-## Arbitrages de Claude après relecture (à vérifier par Alexis)
+## Arbitrages de Claude après relecture (validés par Alexis le 2026-11-24)
 
 - **Ordre de construction** : d'abord un prototype de connexion testé avec Alexis (Google, e-mail, lecture du pourcentage). L'app complète ne démarre que si ce test passe.
 - **Plan B si la connexion intégrée échoue** : les données passent par une petite couche « source d'usage » avec deux implémentations possibles — session claude.ai (principale) et jeton Claude Code (secours, pour ceux qui ont Claude Code, avec demande d'accès au trousseau annoncée par l'assistant). Ne jamais rafraîchir soi-même le jeton Claude Code : relire le trousseau seulement, pour ne pas déconnecter Claude Code.
@@ -101,8 +101,8 @@ Essai réel avec le compte d'Alexis (2026-11-24) :
 
 Structure du code, SwiftUI ou AppKit, format DMG ou zip, hébergement de la page de téléchargement (GitHub Pages proposé), mise en page des écrans, gestion des erreurs réseau, journalisation, version minimale de macOS (au plus bas raisonnable pour des amis peu équipés), tests.
 
-## À valider avec Alexis avant de construire
+## Décisions finales d'Alexis (2026-11-24)
 
-- Essai réel de connexion (Google, puis e-mail) et lecture du pourcentage — nécessite son compte.
-- Les propositions ci-dessus, en particulier l'abandon du jeton Claude Code comme chemin principal.
-- Le libellé dans la barre de menu : « CC: 18 % » (actuel, « CC » = Claude Code) ou un libellé plus parlant pour des novices (icône Claude + « 18 % »).
+- Essai réel de connexion : concluant (voir Résultats de l'essai).
+- Toutes les propositions et tous les arbitrages ci-dessus : validés.
+- Barre de menu : **icône Claude suivie du pourcentage** (« 29 % »), colorée selon le niveau ; on abandonne le libellé « CC: ».
