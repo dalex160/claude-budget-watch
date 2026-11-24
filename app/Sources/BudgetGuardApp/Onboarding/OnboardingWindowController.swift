@@ -89,8 +89,8 @@ final class OnboardingWindowController: NSObject, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
-        // Closed with the X: not completed, the assistant shows again next launch.
-        finish()
+        // Closed with the X: counts as completed only from the last step (see OnboardingFlow).
+        handle(.windowClosed)
     }
 
     // MARK: - Steps

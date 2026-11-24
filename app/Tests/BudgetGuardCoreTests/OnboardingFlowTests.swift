@@ -48,4 +48,11 @@ final class OnboardingFlowTests: XCTestCase {
         XCTAssertTrue(OnboardingFlow.marksCompleted(closingFrom: .done))
         XCTAssertFalse(OnboardingFlow.marksCompleted(closingFrom: .check))
     }
+
+    func testWindowCloseAlwaysClosesAndOnlyDoneCounts() {
+        for step in [OnboardingStep.welcome, .login, .check, .settings, .done] {
+            XCTAssertEqual(OnboardingFlow.next(from: step, event: .windowClosed), .close)
+            XCTAssertEqual(OnboardingFlow.marksCompleted(closingFrom: step), step == .done)
+        }
+    }
 }

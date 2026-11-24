@@ -5,7 +5,7 @@ public enum OnboardingStep: Equatable {
 }
 
 public enum OnboardingEvent: Equatable {
-    case start, loggedIn, checkSucceeded, continueTapped, backToLogin
+    case start, loggedIn, checkSucceeded, continueTapped, backToLogin, windowClosed
 }
 
 public enum OnboardingTransition: Equatable {
@@ -26,6 +26,7 @@ public enum OnboardingFlow {
         case (.check, .backToLogin): return .go(.login)
         case (.settings, .continueTapped): return .go(.done)
         case (.done, .continueTapped): return .close
+        case (_, .windowClosed): return .close
         default: return .stay
         }
     }
