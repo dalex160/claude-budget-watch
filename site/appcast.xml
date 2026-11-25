@@ -1,0 +1,14 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Budget Guard</title>
+        <item>
+            <title>2.0.0</title>
+            <pubDate>Wed, 25 Nov 2026 19:26:28 +0100</pubDate>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>2.0.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/dalex160/claude-budget-watch/releases/download/v2.0.0/BudgetGuard-2.0.0.dmg" length="1899810" type="application/octet-stream" sparkle:edSignature="6Dkvo2PxFZXzWWhNgIRe9RpPdioYUxsg4DaFmJ/ZBMS1ARts3qTbBQbrQl5gUA4TV4/RyBJe8acteE26Bz+NAw=="/>
+        </item>
+    </channel>
+</rss>
