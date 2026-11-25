@@ -3,6 +3,14 @@
     <channel>
         <title>Budget Guard</title>
         <item>
+            <title>2.0.1</title>
+            <pubDate>Wed, 25 Nov 2026 19:27:41 +0100</pubDate>
+            <sparkle:version>2</sparkle:version>
+            <sparkle:shortVersionString>2.0.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/dalex160/claude-budget-watch/releases/download/v2.0.1/BudgetGuard-2.0.1.dmg" length="1899875" type="application/octet-stream" sparkle:edSignature="/KjhAGShsZS7+IvxKVYoOX3Tm4r6p6kAh4vdgwxlpG7B6YperOEduE2LnUEipzR8FxbcK1GNriGVxgCKLZCPAA=="/>
+        </item>
+        <item>
             <title>2.0.0</title>
             <pubDate>Wed, 25 Nov 2026 19:26:28 +0100</pubDate>
             <sparkle:version>1</sparkle:version>
