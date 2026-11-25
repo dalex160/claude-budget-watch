@@ -2,6 +2,8 @@
 
 **Télécharger : https://dalex160.github.io/claude-budget-watch/**
 
+Ou avec Homebrew : `brew tap dalex160/budget-guard && brew install budget-guard`
+
 Budget Guard est une application pour Mac qui affiche en permanence, dans la barre des menus, la part de votre forfait Claude utilisée cette semaine.
 Elle vous prévient à 80 % et à 95 %, et se met à jour toute seule.
 Elle s'installe en trois étapes expliquées sur la page de téléchargement.
@@ -49,7 +51,7 @@ Budget Guard is a [SwiftBar](https://github.com/swiftbar/SwiftBar) plugin that d
 
 ### Installation
 
-#### Option A -- Homebrew (recommended)
+#### Option A -- Homebrew (no longer available: the tap now installs the new app)
 
 ```bash
 brew install --cask swiftbar        # if not already installed
