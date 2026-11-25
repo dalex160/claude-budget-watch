@@ -2,23 +2,35 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleDevelopmentRegion</key><string>fr</string>
-    <key>CFBundleExecutable</key><string>BudgetGuardApp</string>
-    <key>CFBundleIconFile</key><string>AppIcon</string>
-    <key>CFBundleIdentifier</key><string>com.alexisdahan.BudgetGuard</string>
-    <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
-    <key>CFBundleName</key><string>Budget Guard</string>
-    <key>CFBundleDisplayName</key><string>Budget Guard</string>
-    <key>CFBundlePackageType</key><string>APPL</string>
-    <!-- A chaque release, augmenter les DEUX : CFBundleShortVersionString (affichée) et CFBundleVersion (entier que Sparkle compare ;
-         scripts/release.sh refuse si elle n'est pas supérieure à la plus haute de site/appcast.xml). -->
-    <key>CFBundleShortVersionString</key><string>2.0.0</string>
-    <key>CFBundleVersion</key><string>1</string>
-    <key>LSMinimumSystemVersion</key><string>13.0</string>
-    <key>LSUIElement</key><true/>
-    <key>NSHumanReadableCopyright</key><string>© 2026 Alexis Dahan</string>
-    <key>SUFeedURL</key><string>https://dalex160.github.io/claude-budget-watch/appcast.xml</string>
-    <key>SUEnableAutomaticChecks</key><true/>
-    <!-- SUPublicEDKey is injected by scripts/build-app.sh from scripts/sparkle-public-key.txt -->
+	<key>CFBundleDevelopmentRegion</key>
+	<string>fr</string>
+	<key>CFBundleDisplayName</key>
+	<string>Budget Guard</string>
+	<key>CFBundleExecutable</key>
+	<string>BudgetGuardApp</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.alexisdahan.BudgetGuard</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Budget Guard</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.0.1</string>
+	<key>CFBundleVersion</key>
+	<string>2</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>13.0</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>© 2026 Alexis Dahan</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://dalex160.github.io/claude-budget-watch/appcast.xml</string>
 </dict>
 </plist>
